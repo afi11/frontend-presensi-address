@@ -1,6 +1,7 @@
 import { createRouter, createWebHistory } from "vue-router";
 import HomeView from "../views/HomeView.vue";
 import LoginView from "../views/auth/LoginView.vue";
+import DivisiView from "../views/divisi/DivisiView.vue";
 import Auth from "../config/auth";
 
 const router = createRouter({
@@ -25,6 +26,12 @@ const router = createRouter({
       path: "/login",
       name: "login",
       component: LoginView,
+      meta: { requiresAuth: false }
+    },
+    {
+      path: "/divisi",
+      name: "divisi",
+      component: DivisiView,
       meta: { requiresAuth: false }
     },
   ],

@@ -1,11 +1,13 @@
 import axios from "axios";
 import { defineStore } from "pinia";
-import Auth from "../config/auth";
+import { APISettings } from "../config/api";
 
 export const useDivisiStore = defineStore({
   id: "divisi",
   state: () => ({
     divisis: [],
+    total_pages: 0,
+    total_rows: 0
   }),
   getters: {
     getDivisi(state) {
@@ -13,25 +15,30 @@ export const useDivisiStore = defineStore({
     },
   },
   actions: {
-    async fetchDivisi() {
+    async fetchDivisi(limit, page) {
       try {
-        let request_headers = {};
-        request_headers["Accept"] = "application/json";
-        request_headers["Authorization"] =
-          "Bearer" + " " + Auth.checkUserLoggin();
         const data = await axios.get(
-          "http://localhost:9000/divisi/all-divisi?page=1&limit=5&sort=nama_divisi&order=desc",
-          { headers: request_headers }
+          APISettings.baseURL +
+            `/divisi/all-divisi?page=${page}&limit=${limit}&sort=nama_divisi&order=asc`,
+          { headers: APISettings.headers }
         );
-        // const data = await axios.get("http://localhost:9000/divisi/all-divisi?page=1&limit=5&sort=nama_divisi&order=desc", {
-        //     headers: {
-        //         Authorization: "Bearer "+Auth.checkUserLoggin()
-        //     }
-        // })
-        this.divisis = data.data;
-        // await fetch(
-        //     "http://localhost:9000/divisi/all-divisi?page=1&limit=5&sort=nama_divisi&order=desc"
-        //   ).then((response) => response.json());
+        this.divisis = data.data.data.rows;
+        this.total_pages = data.data.data.total_pages;
+        this.total_rows = data.data.data.total_rows;
+      } catch (error) {
+        alert(error);
+        console.log(error);
+      }
+    },
+    async postDivisi(divisi) {
+      try {
+        await axios.post(
+          APISettings.baseURL + "/divisi/create-divisi",
+          divisi,
+          { headers: APISettings.headers }
+        );
+        this.fetchDivisi();
+        document.querySelector("#btnCloseModal").click();
       } catch (error) {
         alert(error);
         console.log(error);

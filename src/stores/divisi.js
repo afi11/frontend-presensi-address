@@ -1,5 +1,7 @@
 import axios from "axios";
 import { defineStore } from "pinia";
+import Swal from "sweetalert2/dist/sweetalert2.js";
+import "sweetalert2/src/sweetalert2.scss";
 import { APISettings } from "../config/api";
 
 export const useDivisiStore = defineStore({
@@ -38,11 +40,31 @@ export const useDivisiStore = defineStore({
           { headers: APISettings.headers }
         );
         this.fetchDivisi();
-        document.querySelector("#btnCloseModal").click();
+        document.querySelector("#btnCloseAddModal").click();
       } catch (error) {
         alert(error);
         console.log(error);
       }
     },
+    async updateDivisi(divisi) {
+      try {
+        await axios.put(APISettings.baseURL + "/divisi/update-divisi/" + divisi.id, divisi, { headers: APISettings.headers });
+        this.fetchDivisi();
+        document.querySelector("#btnCloseEditModal").click();
+      }catch (error) {
+        alert(error);
+        console.log(error);
+      }
+    },
+    async deleteDivisi(divisi) {
+      try {
+        await axios.delete(APISettings.baseURL + "/divisi/delete-divisi/" + divisi.id,  { headers: APISettings.headers });
+        this.fetchDivisi();
+        Swal.fire("Deleted!", "Your data has been deleted.", "success");
+      }catch (error) {
+        alert(error);
+        console.log(error);
+      }
+    }
   },
 });

@@ -7,6 +7,7 @@ defineProps({
     type: String
   }
 });
+
 </script>
 
 <template>
@@ -14,10 +15,11 @@ defineProps({
     <div class="card-body">
       <h5 class="card-title">{{ title }}</h5>
       <h6 class="card-subtitle mb-2 text-muted">{{ subtitle }}</h6>
-      <a href="#" class="card-link text-success">
+      <a href="#" data-bs-toggle="modal"
+          data-bs-target="#modalEditRuangan" class="card-link text-success" @click="$emit('get-data')" >
         <i class="bi-pencil"></i>
       </a>
-      <a href="#" class="card-link text-danger">
+      <a href="#" class="card-link text-danger" @click="$emit('del-data')">
         <i class="bi-trash"></i>
       </a>
     </div>

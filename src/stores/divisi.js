@@ -8,6 +8,10 @@ export const useDivisiStore = defineStore({
   id: "divisi",
   state: () => ({
     divisis: [],
+    current_page: 1,
+    page: 1,
+    limit: 5,
+    search: "",
     total_pages: 0,
     total_rows: 0
   }),
@@ -17,11 +21,26 @@ export const useDivisiStore = defineStore({
     },
   },
   actions: {
-    async fetchDivisi(limit, page) {
+    async nextPage() {
+      this.page = this.page + 1;
+      this.current_page = this.page;
+      this.fetchDivisi(this.limit, this.page, this.search);
+    },
+    async previousPage() {
+      this.page = this.page - 1;
+      this.current_page = this.page;
+      this.fetchDivisi(this.limit, this.page, this.search);
+    },
+    async gotoPage(numPage){
+      this.page = numPage;
+      this.current_page = this.page;
+      this.fetchDivisi(this.limit, this.page, this.search);
+    },
+    async fetchDivisi(limit, page, search) {
       try {
         const data = await axios.get(
           APISettings.baseURL +
-            `/divisi/all-divisi?page=${page}&limit=${limit}&sort=nama_divisi&order=asc`,
+            `/divisi/all-divisi?page=${page}&limit=${limit}&sort=nama_divisi&order=asc&search=${search}`,
           { headers: APISettings.headers }
         );
         this.divisis = data.data.data.rows;
@@ -39,7 +58,7 @@ export const useDivisiStore = defineStore({
           divisi,
           { headers: APISettings.headers }
         );
-        this.fetchDivisi();
+        this.fetchDivisi(this.limit, this.page, this.search);
         document.querySelector("#btnCloseAddModal").click();
       } catch (error) {
         alert(error);
@@ -49,7 +68,7 @@ export const useDivisiStore = defineStore({
     async updateDivisi(divisi) {
       try {
         await axios.put(APISettings.baseURL + "/divisi/update-divisi/" + divisi.id, divisi, { headers: APISettings.headers });
-        this.fetchDivisi();
+        this.fetchDivisi(this.limit, this.page, this.search);
         document.querySelector("#btnCloseEditModal").click();
       }catch (error) {
         alert(error);
@@ -59,7 +78,7 @@ export const useDivisiStore = defineStore({
     async deleteDivisi(divisi) {
       try {
         await axios.delete(APISettings.baseURL + "/divisi/delete-divisi/" + divisi.id,  { headers: APISettings.headers });
-        this.fetchDivisi();
+        this.fetchDivisi(this.limit, this.page, this.search);
         Swal.fire("Deleted!", "Your data has been deleted.", "success");
       }catch (error) {
         alert(error);

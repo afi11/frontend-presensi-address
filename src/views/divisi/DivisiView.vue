@@ -7,17 +7,15 @@ import "sweetalert2/src/sweetalert2.scss";
 import { useDivisiStore } from "../../stores/divisi";
 import CardItem from "../../components/cards/CardItem.vue";
 
-const { divisis } = storeToRefs(useDivisiStore());
+const { divisis, page, limit, total_pages, search } = storeToRefs(useDivisiStore());
 const store = useDivisiStore();
 
 const id_divisi = ref(null);
 const nama_divisi = ref(null);
-const limit = ref(5);
 const listLimit = ref([5, 10, 50, 100]);
-const page = ref(1);
 
 onMounted(() => {
-  store.fetchDivisi(limit.value, page.value);
+  store.fetchDivisi(limit.value, page.value, search.value);
 });
 
 function clearData() {
@@ -26,7 +24,7 @@ function clearData() {
 }
 
 function changeLimit() {
-  store.fetchDivisi(limit.value, page.value);
+  store.fetchDivisi(limit, page);
 }
 
 function actionSubmitDivisi() {
@@ -62,6 +60,24 @@ function actionConfirmDelete(divisi) {
     }
   });
 }
+
+function nextPage() {
+  store.nextPage();
+}
+
+function previousPage() {
+  store.previousPage();
+}
+
+function onSearch() {
+  store.fetchDivisi(limit.value, page.value, search.value);
+}
+
+
+// function gotoPage(numberPage) {
+//   store.gotoPage(numberPage);
+// }
+
 </script>
 
 <template>
@@ -87,7 +103,7 @@ function actionConfirmDelete(divisi) {
             </select>
           </div>
           <div class="col-6">
-            <input type="text" class="form-control" placeholder="Search..." />
+            <input type="text" class="form-control" @change="onSearch()" v-model="search" placeholder="Search..." />
           </div>
         </div>
         <button
@@ -109,17 +125,15 @@ function actionConfirmDelete(divisi) {
 
         <nav aria-label="Page navigation example">
           <ul class="pagination">
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Previous">
-                <span aria-hidden="true">&laquo;</span>
+            <li class="page-item" v-if="page > 1">
+              <a class="page-link" @click="previousPage()" href="#" aria-label="Previous">
+                <span aria-hidden="true">Previous</span>
               </a>
             </li>
-            <li class="page-item"><a class="page-link" href="#">1</a></li>
-            <li class="page-item"><a class="page-link" href="#">2</a></li>
-            <li class="page-item"><a class="page-link" href="#">3</a></li>
-            <li class="page-item">
-              <a class="page-link" href="#" aria-label="Next">
-                <span aria-hidden="true">&raquo;</span>
+            <!-- <li class="page-item" v-for="i in total_pages"><a class="page-link" @click="gotoPage(i)" href="#">{{ i }}</a></li> -->
+            <li class="page-item" v-if="page < total_pages">
+              <a class="page-link" @click="nextPage()" href="#" aria-label="Next">
+                <span aria-hidden="true">Next</span>
               </a>
             </li>
           </ul>
